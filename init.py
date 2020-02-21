@@ -10,7 +10,7 @@ Created on Tue Feb 17 10:10:35 2020
 #install poppler and tesseract also needed
 from PIL import Image
 import pytesseract
-import sys 
+import sys
 from pdf2image import convert_from_path
 
 
@@ -35,8 +35,8 @@ image_counter = 1
 for page in pages:
     filename = sample_pdf_path[:name_length]+'_pdf_page_'+str(image_counter)+'.jpg'
     page.save(filename, 'JPEG')
-    
-    image_counter = image_counter +1 
+
+    image_counter = image_counter +1
 
 filelimit = image_counter-1
 
@@ -51,24 +51,24 @@ for i in range(1, filelimit + 1):
     f.write(text)
 f.close()
 
-pdf = open(sample_pdf_path,  mode='r', buffering=-1, encoding='utf-8', errors=None, newline=None, closefd=True).read()
+pdf = open(sample_pdf_path, 'rb').read()
 
 #figures
 while True:
-    istream = pdf.find("stream", figures)
+    istream = pdf.find("stream".encode('utf-8'), figures)
     if istream < 0:
         break
-    istart = pdf.find(startmark, istream, istream+20)
+    istart = pdf.find(startmark.encode('utf-8'), istream, istream+20)
     if istart < 0:
         figures = istream+20
         continue
-    iend = pdf.find("endstream", istart)
+    iend = pdf.find("endstream".encode('utf-8'), istart)
     if iend < 0:
         raise Exception("Didn't find end of stream!")
-    iend = pdf.find(endmark, iend-20)
+    iend = pdf.find(endmark.encode('utf-8'), iend-20)
     if iend < 0:
         raise Exception("Didn't find end of JPG!")
-    
+
     istart += startfix
     iend += endfix
     print ("JPG %d from %d to %d" % njpg, istart, iend)
@@ -76,12 +76,13 @@ while True:
     jpgfile = open("jpg%d.jpg" % njpg, "wb")
     jpgfile.write(jpg)
     jpgfile.close()
-    
+
     njpg += 1
-    figures = iend  
+    figures = iend
+    pring('istream ='+ istream, 'istart = '+ istart, 'figures ='+ figures, 'iend ='+iend )
 
 #refrences
 
 
 
-    
+
