@@ -14,9 +14,9 @@ import sys
 from pdf2image import convert_from_path
 
 
-startmark = "\xff\xd8"
+startmark = b'\xff\xd8\xff'
 startfix = 0
-endmark = "\xff\xd9"
+endmark = b"\xff\xd9\r\n"
 endfix = 2
 figures = 0
 njpg = 0
@@ -55,31 +55,31 @@ pdf = open(sample_pdf_path, 'rb').read()
 
 #figures
 while True:
-    istream = pdf.find("stream".encode('utf-8'), figures)
+    istream = pdf.find(b"stream", figures)
     if istream < 0:
         break
-    istart = pdf.find(startmark.encode('utf-8'), istream, istream+20)
+    istart = pdf.find(startmark, istream, istream+20)
     if istart < 0:
         figures = istream+20
         continue
-    iend = pdf.find("endstream".encode('utf-8'), istart)
+    iend = pdf.find(b"endstream", istart)
     if iend < 0:
         raise Exception("Didn't find end of stream!")
-    iend = pdf.find(endmark.encode('utf-8'), iend-20)
+    iend = pdf.find(endmark, iend-20)
     if iend < 0:
         raise Exception("Didn't find end of JPG!")
 
     istart += startfix
     iend += endfix
-    print ("JPG %d from %d to %d" % njpg, istart, iend)
+    print ("IMAAGE %d from %d to %d" % (njpg, istart, iend))
     jpg = pdf[istart:iend]
-    jpgfile = open("jpg%d.jpg" % njpg, "wb")
+    jpgfile = open("fig%d.jpg" % njpg, "wb")
     jpgfile.write(jpg)
     jpgfile.close()
 
     njpg += 1
     figures = iend
-    pring('istream ='+ istream, 'istart = '+ istart, 'figures ='+ figures, 'iend ='+iend )
+    print('Found: istream ='+ str(istream), 'istart = '+ str(istart), 'figures ='+ str(figures), 'iend ='+ str(iend))
 
 #refrences
 
